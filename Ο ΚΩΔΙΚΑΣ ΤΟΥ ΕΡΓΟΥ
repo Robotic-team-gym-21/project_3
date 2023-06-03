@@ -1,0 +1,122 @@
+
+#include<Servo.h>
+
+int servoPin1=12;
+Servo s1;
+
+int servoPin2=13;
+Servo s2;
+
+int Left_Sensor=2;
+int Right_Sensor=3;
+
+int enB= 11;
+int IN3=7;
+int IN4=6;
+int enA=5;
+int IN1=9;
+int IN2=8;
+int waterSensor=A0;
+int waterSensorValue=0;
+
+void setup() {
+  // put your setup code here, to run once:
+s1.attach(servoPin1);
+s2.attach(servoPin2);
+s1.write(75);
+s2.write(0);
+
+pinMode(Left_Sensor, INPUT);
+pinMode(Right_Sensor, INPUT);
+
+pinMode(enB, OUTPUT);
+pinMode(IN3, OUTPUT);
+pinMode(IN4, OUTPUT);
+
+pinMode(enA, OUTPUT);
+pinMode(IN1, OUTPUT);
+pinMode(IN2, OUTPUT);
+analogWrite(enA, 135);
+analogWrite(enB, 155);
+Serial.begin(9600); 
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+  int L_IR = digitalRead(Left_Sensor);
+  int R_IR = digitalRead(Right_Sensor);
+ 
+    if (L_IR == 0 && R_IR == 0)//the vehicle moves straight
+    {
+      digitalWrite(IN3, LOW);
+      digitalWrite(IN4, HIGH);
+
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, HIGH);
+      s2.write(0);
+      s1.write(75);
+    }
+     else if (L_IR == 1 && R_IR == 0)//the vehicle moves straight
+    {
+      digitalWrite(IN3, LOW);
+      digitalWrite(IN4, LOW);
+
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, HIGH); 
+      s2.write(0);
+      s1.write(75); 
+    }
+
+      else if (L_IR == 0 && R_IR == 1)//the vehicle moves straight
+    {
+      digitalWrite(IN3, LOW);
+      digitalWrite(IN4, HIGH);
+  
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, LOW);
+      s2.write(0);
+      s1.write(75);  
+    }
+
+      else if (L_IR == 1 && R_IR == 1 )//the vehicle stopped
+      
+      {digitalWrite(IN3, LOW);
+      digitalWrite(IN4, LOW);
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, LOW);
+      s2.write(80);
+      s1.write(75);
+      delay(1500);
+
+
+  bool continue_looping = true;
+
+    while (continue_looping) {
+      int waterSensorValue = analogRead(A0);
+      Serial.println(analogRead(waterSensor));  
+      
+      if (waterSensorValue > 500){
+    // είναι στεγνό το έδαφος
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    s1.write(0);
+       }
+  else if (waterSensorValue < 500){
+    // είναι υγρό το έδαφος
+    s1.write(75);
+    s2.write(0);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+  }
+      // Έλεγχος αν πρέπει να συνεχίσει η επανάληψη
+      if (digitalRead(Left_Sensor) == 0 && digitalRead(Right_Sensor) == 0) {
+        // Οι αισθητήρες έδειξαν ότι το ρομπότ πρέπει να συνεχίσει να κινείται μπροστά
+        continue_looping = false;
+      } 
+      delay(50);    
+} } }
